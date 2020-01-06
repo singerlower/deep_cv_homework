@@ -13,7 +13,7 @@ img_origin1 = cv2.imread('lenna.jpg', 1)  # 0：黑白图(二维灰度图)， 1�
 # img_origin2 = cv2.imread('lenna.jpg', 0)  # 0：黑白图(二维灰度图)， 1彩图（三维彩图）
 
 # 剪切图片(image crop)
-# show_image(img_origin1[100:300][100:200])
+# show_image(img_origin1[100:300, 100:200])
 
 # 通道切分（channal split）
 # B,G,R = cv2.split(img_origin1)
@@ -31,8 +31,8 @@ def image_color(img,b_alp=0, g_alp=0, r_alp=0):
     # B[B<b_lim] = (B[B<b_lim] + b_alp).astype(img.dtype)
     # 修改B
     B = B + b_alp
-    if b_alp > 0: B[B > 255] = 255
-    else: B[B<0] = 0
+    if b_alp > 0: B[B > 255] = 255  # 增加
+    else: B[B<0] = 0  # 减少
 
     G = G + g_alp
     if g_alp > 0: G[G > 255] = 255
@@ -67,9 +67,10 @@ def histogram_equalization(img1, img2):
     plt.subplot(122)  # 一行2列第2个
     plt.title('imge2')
     plt.hist(img2.flatten(), 256, [0,256], color='r')
+            # x数据， bins条数， range x轴范围，  颜色
     plt.show()
 
-histogram_equalization(img_origin1, image)
+# histogram_equalization(img_origin1, image)
 
 
 # YUV色彩空间的Y进行直方图来调节图片 y:明亮调节通道
@@ -83,4 +84,43 @@ def yuv():
     show_image(cv2.cvtColor(img_yuv,cv2.COLOR_YUV2BGR))
 # yuv()
 
-# 相似/仿射/投影/变换
+def perspect_transform():
+    # 投影变换
+    pts1 = np.float32([[0,0],[0,500],[500,0],[500,500]]) # 原始点
+    pts2 = np.float32([[0,0],[0,400],[300,0],[450,550]])  # 投射点
+    M = cv2.getPerspectiveTransform(pts1, pts2)  # 获取投射点
+    img_wrap = cv2.warpPerspective(img_origin1, M, (550,550)) # 生成图片
+    show_image(img_wrap)
+# perspect_transform()
+
+def affine():
+    # 仿射  变换后，平移
+    rows, cols, ch = img_origin1.shape
+    pts1 = np.float32([[0, 0], [cols - 1, 0], [0, rows - 1]])
+    pts2 = np.float32([[cols * 0.2, rows * 0.1], [cols * 0.7, rows * 0.2], [cols * 0.1, rows * 0.9]])
+    M = cv2.getAffineTransform(pts1, pts2)
+    img_wrap = cv2.warpAffine(img_origin1, M, (cols, rows))
+    show_image(img_wrap)
+# affine()
+
+
+img_origin2 = cv2.imread('lenna.jpg', 0)  # 0：黑白图(二维灰度图)， 1彩图（三维彩图）
+# show_image(img_origin2)
+def dilate():
+    # 膨胀  更白 -》255
+    image = cv2.dilate(img_origin2, None, iterations=1)
+    show_image(image)
+# dilate()
+
+def erode():
+    # 腐蚀  更黑 -》 0
+    image = cv2.erode(img_origin2, None, iterations=1)
+    show_image(image)
+# erode()
+
+# 旋转
+def rot():
+    image = cv2.rotate(img_origin1, rotateCode = cv2.ROTATE_90_CLOCKWISE)
+    show_image(image)
+rot()
+
