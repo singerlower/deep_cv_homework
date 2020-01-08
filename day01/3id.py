@@ -43,6 +43,6 @@ def hsv():
     V[V>100] = 255
     image = cv2.merge((H,S,V))
     plt.figure(figsize=(4,4))
-    plt.imshow(cv2.cvtColor(image, cv2.COLOR_HSV2RGB))  # 彩图
+    plt.imshow(cv2.cvtColor(image, cv2.COLOR_HSV2BGR))  # 彩图
     plt.show()  # 显示图片
 hsv()
